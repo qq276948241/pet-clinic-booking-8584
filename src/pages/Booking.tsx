@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, CheckCircle, User, Phone, Cat, Dog, Bird, Fish, Rabbit } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CheckCircle, User, Phone, Cat, Dog, Bird, Fish, Rabbit, PawPrint, FileText } from 'lucide-react';
 import { departments, getDoctorsByDepartment } from '@/data/mockData';
 import { useBookingStore } from '@/store/useBookingStore';
 import StepIndicator from '@/components/StepIndicator';
@@ -8,7 +8,7 @@ import DepartmentCard from '@/components/DepartmentCard';
 import DoctorCard from '@/components/DoctorCard';
 import TimeSlotPicker from '@/components/TimeSlotPicker';
 
-const steps = ['选择科室', '选择医生', '选择时间', '填写信息'];
+const steps = ['选择科室', '选择医生', '选择时间', '宠物信息', '填写信息'];
 
 const petTypes = [
   { value: '狗狗', icon: Dog },
@@ -22,10 +22,7 @@ const petTypes = [
 const Booking = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState({
-    petName: '',
-    petType: '',
-    petAge: '',
+  const [contactInfo, setContactInfo] = useState({
     ownerName: '',
     phone: '',
     notes: '',
@@ -37,7 +34,9 @@ const Booking = () => {
     selectedDepartment,
     selectedDoctor,
     selectedTimeSlot,
+    petInfo,
     setSelectedDepartment,
+    setPetInfo,
     addAppointment,
     resetSelection,
   } = useBookingStore();
@@ -47,33 +46,50 @@ const Booking = () => {
     return getDoctorsByDepartment(selectedDepartment.id);
   }, [selectedDepartment]);
 
+  const canProceedStep3 = () => {
+    return (
+      petInfo.petName.trim() &&
+      petInfo.petType &&
+      petInfo.petBreed.trim() &&
+      petInfo.petAge > 0
+    );
+  };
+
+  const canProceedStep4 = () => {
+    return (
+      contactInfo.ownerName.trim() &&
+      contactInfo.phone.trim() &&
+      /^1[3-9]\d{9}$/.test(contactInfo.phone)
+    );
+  };
+
   const canProceed = () => {
     switch (currentStep) {
       case 0: return !!selectedDepartment;
       case 1: return !!selectedDoctor;
       case 2: return !!selectedTimeSlot;
-      case 3:
-        return (
-          formData.petName.trim() &&
-          formData.petType &&
-          formData.petAge &&
-          formData.ownerName.trim() &&
-          formData.phone.trim() &&
-          /^1[3-9]\d{9}$/.test(formData.phone)
-        );
+      case 3: return canProceedStep3();
+      case 4: return canProceedStep4();
       default: return false;
     }
   };
 
   const validateStep3 = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.petName.trim()) newErrors.petName = '请输入宠物名字';
-    if (!formData.petType) newErrors.petType = '请选择宠物类型';
-    if (!formData.petAge) newErrors.petAge = '请输入宠物年龄';
-    if (!formData.ownerName.trim()) newErrors.ownerName = '请输入联系人姓名';
-    if (!formData.phone.trim()) {
+    if (!petInfo.petName.trim()) newErrors.petName = '请输入宠物名字';
+    if (!petInfo.petType) newErrors.petType = '请选择宠物类型';
+    if (!petInfo.petBreed.trim()) newErrors.petBreed = '请输入宠物品种';
+    if (!petInfo.petAge || petInfo.petAge <= 0) newErrors.petAge = '请输入宠物年龄';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep4 = () => {
+    const newErrors: Record<string, string> = {};
+    if (!contactInfo.ownerName.trim()) newErrors.ownerName = '请输入联系人姓名';
+    if (!contactInfo.phone.trim()) {
       newErrors.phone = '请输入手机号';
-    } else if (!/^1[3-9]\d{9}$/.test(formData.phone)) {
+    } else if (!/^1[3-9]\d{9}$/.test(contactInfo.phone)) {
       newErrors.phone = '请输入正确的手机号';
     }
     setErrors(newErrors);
@@ -83,18 +99,23 @@ const Booking = () => {
   const handleNext = () => {
     if (currentStep === 3) {
       if (!validateStep3()) return;
+      setCurrentStep(currentStep + 1);
+    } else if (currentStep === 4) {
+      if (!validateStep4()) return;
       if (selectedDepartment && selectedDoctor && selectedTimeSlot) {
         addAppointment({
           departmentId: selectedDepartment.id,
           doctorId: selectedDoctor.id,
           date: selectedTimeSlot.date,
           time: selectedTimeSlot.time,
-          petName: formData.petName,
-          petType: formData.petType,
-          petAge: parseInt(formData.petAge),
-          ownerName: formData.ownerName,
-          phone: formData.phone,
-          notes: formData.notes,
+          petName: petInfo.petName,
+          petType: petInfo.petType,
+          petBreed: petInfo.petBreed,
+          petAge: petInfo.petAge,
+          petSymptoms: petInfo.petSymptoms,
+          ownerName: contactInfo.ownerName,
+          phone: contactInfo.phone,
+          notes: contactInfo.notes,
         });
         setShowSuccess(true);
       }
@@ -106,14 +127,41 @@ const Booking = () => {
   const handlePrev = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
+      setErrors({});
     }
   };
 
   const handleSuccessClose = () => {
     setShowSuccess(false);
     resetSelection();
+    setContactInfo({ ownerName: '', phone: '', notes: '' });
     navigate('/my-appointments');
   };
+
+  const renderSummary = () => (
+    <div className="bg-primary-50 rounded-2xl p-4 mb-6">
+      <div className="text-sm text-gray-600 space-y-1">
+        <div>
+          <span className="text-gray-400">科室：</span>
+          <span className="font-medium">{selectedDepartment?.name}</span>
+        </div>
+        <div>
+          <span className="text-gray-400">医生：</span>
+          <span className="font-medium">{selectedDoctor?.name} · {selectedDoctor?.title}</span>
+        </div>
+        <div>
+          <span className="text-gray-400">时间：</span>
+          <span className="font-medium">{selectedTimeSlot?.date} {selectedTimeSlot?.time}</span>
+        </div>
+        {currentStep >= 4 && (
+          <div>
+            <span className="text-gray-400">宠物：</span>
+            <span className="font-medium">{petInfo.petName} · {petInfo.petType} · {petInfo.petBreed}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -162,26 +210,12 @@ const Booking = () => {
       case 3:
         return (
           <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">填写预约信息</h2>
-            <p className="text-gray-500 mb-6">请填写宠物和联系人信息</p>
-
-            <div className="bg-primary-50 rounded-2xl p-4 mb-6">
-              <div className="text-sm text-gray-600 space-y-1">
-                <div>
-                  <span className="text-gray-400">科室：</span>
-                  <span className="font-medium">{selectedDepartment?.name}</span>
-                </div>
-                <div>
-                  <span className="text-gray-400">医生：</span>
-                  <span className="font-medium">{selectedDoctor?.name} · {selectedDoctor?.title}</span>
-                </div>
-                <div>
-                  <span className="text-gray-400">时间：</span>
-                  <span className="font-medium">{selectedTimeSlot?.date} {selectedTimeSlot?.time}</span>
-                </div>
-              </div>
-            </div>
-
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <PawPrint className="w-6 h-6 text-primary-500" />
+              填写宠物信息
+            </h2>
+            <p className="text-gray-500 mb-6">请填写爱宠的详细信息，帮助医生更好地诊断</p>
+            {currentStep > 3 && renderSummary()}
             <div className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -189,9 +223,9 @@ const Booking = () => {
                 </label>
                 <input
                   type="text"
-                  value={formData.petName}
+                  value={petInfo.petName}
                   onChange={(e) => {
-                    setFormData({ ...formData, petName: e.target.value });
+                    setPetInfo({ petName: e.target.value });
                     if (errors.petName) setErrors({ ...errors, petName: '' });
                   }}
                   placeholder="请输入宠物名字"
@@ -215,11 +249,11 @@ const Booking = () => {
                       <button
                         key={type.value}
                         onClick={() => {
-                          setFormData({ ...formData, petType: type.value });
+                          setPetInfo({ petType: type.value });
                           if (errors.petType) setErrors({ ...errors, petType: '' });
                         }}
                         className={`flex flex-col items-center gap-1 py-3 px-2 rounded-xl border-2 transition-all ${
-                          formData.petType === type.value
+                          petInfo.petType === type.value
                             ? 'border-primary-400 bg-primary-50 text-primary-600'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
@@ -235,15 +269,37 @@ const Booking = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                  宠物品种 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={petInfo.petBreed}
+                  onChange={(e) => {
+                    setPetInfo({ petBreed: e.target.value });
+                    if (errors.petBreed) setErrors({ ...errors, petBreed: '' });
+                  }}
+                  placeholder="如：金毛、布偶猫、中华田园犬等"
+                  className={`w-full px-4 py-3 rounded-xl border-2 transition-colors focus:outline-none ${
+                    errors.petBreed
+                      ? 'border-red-300 focus:border-red-400'
+                      : 'border-gray-200 focus:border-primary-400'
+                  }`}
+                />
+                {errors.petBreed && <p className="mt-1 text-sm text-red-500">{errors.petBreed}</p>}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   宠物年龄（岁） <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
                   min="0"
                   max="50"
-                  value={formData.petAge}
+                  step="0.1"
+                  value={petInfo.petAge || ''}
                   onChange={(e) => {
-                    setFormData({ ...formData, petAge: e.target.value });
+                    setPetInfo({ petAge: parseFloat(e.target.value) || 0 });
                     if (errors.petAge) setErrors({ ...errors, petAge: '' });
                   }}
                   placeholder="请输入宠物年龄"
@@ -257,14 +313,39 @@ const Booking = () => {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-primary-500" />
+                  症状描述
+                </label>
+                <textarea
+                  value={petInfo.petSymptoms}
+                  onChange={(e) => setPetInfo({ petSymptoms: e.target.value })}
+                  placeholder="请详细描述宠物的症状，如：食欲不振、呕吐、精神萎靡、皮肤瘙痒等（选填）"
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-400 transition-colors focus:outline-none resize-none"
+                />
+                <p className="mt-1 text-xs text-gray-400">详细的症状描述有助于医生提前了解病情</p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 4:
+        return (
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">填写联系人信息</h2>
+            <p className="text-gray-500 mb-6">请填写您的联系方式，方便我们与您沟通</p>
+            {renderSummary()}
+            <div className="space-y-5">
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   联系人姓名 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
-                  value={formData.ownerName}
+                  value={contactInfo.ownerName}
                   onChange={(e) => {
-                    setFormData({ ...formData, ownerName: e.target.value });
+                    setContactInfo({ ...contactInfo, ownerName: e.target.value });
                     if (errors.ownerName) setErrors({ ...errors, ownerName: '' });
                   }}
                   placeholder="请输入您的姓名"
@@ -283,9 +364,9 @@ const Booking = () => {
                 </label>
                 <input
                   type="tel"
-                  value={formData.phone}
+                  value={contactInfo.phone}
                   onChange={(e) => {
-                    setFormData({ ...formData, phone: e.target.value });
+                    setContactInfo({ ...contactInfo, phone: e.target.value });
                     if (errors.phone) setErrors({ ...errors, phone: '' });
                   }}
                   placeholder="请输入您的手机号"
@@ -304,9 +385,9 @@ const Booking = () => {
                   备注信息
                 </label>
                 <textarea
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="请输入宠物症状或其他需要说明的信息（选填）"
+                  value={contactInfo.notes}
+                  onChange={(e) => setContactInfo({ ...contactInfo, notes: e.target.value })}
+                  placeholder="其他需要说明的信息（选填）"
                   rows={3}
                   className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-400 transition-colors focus:outline-none resize-none"
                 />
@@ -352,7 +433,7 @@ const Booking = () => {
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
-              {currentStep === 3 ? '提交预约' : '下一步'}
+              {currentStep === 4 ? '提交预约' : '下一步'}
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
@@ -386,7 +467,11 @@ const Booking = () => {
                 </div>
                 <div>
                   <span className="text-gray-400">宠物：</span>
-                  <span className="font-medium">{formData.petName}</span>
+                  <span className="font-medium">{petInfo.petName} · {petInfo.petBreed}</span>
+                </div>
+                <div>
+                  <span className="text-gray-400">联系人：</span>
+                  <span className="font-medium">{contactInfo.ownerName} · {contactInfo.phone}</span>
                 </div>
               </div>
             </div>

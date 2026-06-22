@@ -9,6 +9,13 @@ export const useBookingStore = create<BookingState>()(
       selectedDoctor: null,
       selectedDate: null,
       selectedTimeSlot: null,
+      petInfo: {
+        petName: '',
+        petType: '',
+        petBreed: '',
+        petAge: 0,
+        petSymptoms: '',
+      },
       appointments: [],
 
       setSelectedDepartment: (dept: Department | null) =>
@@ -22,6 +29,11 @@ export const useBookingStore = create<BookingState>()(
 
       setSelectedTimeSlot: (slot: TimeSlot | null) =>
         set({ selectedTimeSlot: slot }),
+
+      setPetInfo: (info) =>
+        set((state) => ({
+          petInfo: { ...state.petInfo, ...info },
+        })),
 
       addAppointment: (appt) =>
         set((state) => ({
@@ -49,6 +61,13 @@ export const useBookingStore = create<BookingState>()(
           selectedDoctor: null,
           selectedDate: null,
           selectedTimeSlot: null,
+          petInfo: {
+            petName: '',
+            petType: '',
+            petBreed: '',
+            petAge: 0,
+            petSymptoms: '',
+          },
         }),
     }),
     {

@@ -72,7 +72,19 @@ const AppointmentCard = ({ appointment }: AppointmentCardProps) => {
             <Phone className="w-4 h-4 text-primary-500" />
             {appointment.phone}
           </div>
+          {appointment.petBreed && (
+            <div className="flex items-center gap-2 text-gray-600 col-span-2">
+              <User className="w-4 h-4 text-primary-500" />
+              品种：{appointment.petBreed} · 年龄：{appointment.petAge}岁
+            </div>
+          )}
         </div>
+
+        {appointment.petSymptoms && (
+          <div className="mb-3 p-3 bg-primary-50 rounded-xl text-sm text-gray-600">
+            <span className="text-gray-400">症状描述：</span>{appointment.petSymptoms}
+          </div>
+        )}
 
         {appointment.notes && (
           <div className="mb-4 p-3 bg-gray-50 rounded-xl text-sm text-gray-600">
