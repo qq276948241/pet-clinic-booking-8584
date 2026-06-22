@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #F0F9FF;
+  min-height: 100vh;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-card shadow-card p-6 transition-all duration-300;
+  }
+  
+  .card:hover {
+    @apply shadow-card-hover;
+  }
+  
+  .btn {
+    @apply px-6 py-3 rounded-button font-medium transition-all duration-200 min-h-[44px] flex items-center justify-center;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700;
+  }
+  
+  .btn-secondary {
+    @apply bg-primary-100 text-primary-700 hover:bg-primary-200;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-primary-300 text-primary-600 hover:bg-primary-50;
+  }
+  
+  .btn-danger {
+    @apply bg-red-500 text-white hover:bg-red-600;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 border-2 border-gray-200 rounded-button focus:border-primary-400 focus:outline-none transition-colors duration-200;
+  }
+  
+  .nav-link {
+    @apply px-4 py-2 rounded-lg transition-colors duration-200;
+  }
+  
+  .nav-link-active {
+    @apply bg-white/20 text-white;
+  }
+  
+  .nav-link-inactive {
+    @apply text-white/80 hover:text-white hover:bg-white/10;
+  }
+}
