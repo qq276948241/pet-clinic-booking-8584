@@ -24,6 +24,11 @@ export interface TimeSlot {
 
 export type AppointmentStatus = 'pending' | 'completed' | 'cancelled';
 
+export type PetType = '狗狗' | '猫咪' | '兔子' | '仓鼠' | '鸟类' | '其他';
+
+export type DogBreed = '金毛' | '拉布拉多' | '泰迪' | '比熊' | '柯基' | '哈士奇' | '萨摩耶' | '边牧' | '其他';
+export type CatBreed = '英短' | '美短' | '布偶' | '暹罗' | '橘猫' | '狸花猫' | '加菲' | '其他';
+
 export interface Appointment {
   id: string;
   departmentId: string;
@@ -34,7 +39,10 @@ export interface Appointment {
   date: string;
   timeSlot: string;
   petName: string;
-  petType: string;
+  petType: PetType;
+  petBreed: string;
+  petAge: string;
+  petGender: '公' | '母';
   ownerName: string;
   phone: string;
   description: string;
@@ -51,7 +59,10 @@ export interface AppointmentForm {
   date: string;
   timeSlot: string;
   petName: string;
-  petType: string;
+  petType: PetType;
+  petBreed: string;
+  petAge: string;
+  petGender: '公' | '母';
   ownerName: string;
   phone: string;
   description: string;

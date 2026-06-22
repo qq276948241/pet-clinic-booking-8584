@@ -5,7 +5,7 @@ import { mockAppointments } from '@/data/mockData';
 
 interface AppointmentState {
   appointments: Appointment[];
-  addAppointment: (form: AppointmentForm) => void;
+  addAppointment: (form: AppointmentForm) => Appointment;
   cancelAppointment: (id: string) => void;
   getAppointmentById: (id: string) => Appointment | undefined;
 }
@@ -18,13 +18,28 @@ export const useAppointmentStore = create<AppointmentState>()(
       addAppointment: (form) => {
         const newAppointment: Appointment = {
           id: Date.now().toString(),
-          ...form,
+          departmentId: form.departmentId,
+          departmentName: form.departmentName,
+          doctorId: form.doctorId,
+          doctorName: form.doctorName,
+          doctorTitle: form.doctorTitle,
+          date: form.date,
+          timeSlot: form.timeSlot,
+          petName: form.petName,
+          petType: form.petType,
+          petBreed: form.petBreed,
+          petAge: form.petAge,
+          petGender: form.petGender,
+          ownerName: form.ownerName,
+          phone: form.phone,
+          description: form.description,
           status: 'pending',
           createdAt: new Date().toISOString(),
         };
         set((state) => ({
           appointments: [newAppointment, ...state.appointments],
         }));
+        return newAppointment;
       },
 
       cancelAppointment: (id) => {
