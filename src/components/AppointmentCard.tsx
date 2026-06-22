@@ -1,5 +1,5 @@
 import { Appointment, Department, Doctor } from '@/types';
-import { Calendar, Clock, User, Phone, PawPrint, X } from 'lucide-react';
+import { Calendar, Clock, User, Phone, PawPrint, X, FileText } from 'lucide-react';
 import { getWeekday } from '@/utils/dateUtils';
 import { cn } from '@/lib/utils';
 
@@ -58,14 +58,26 @@ export default function AppointmentCard({
             <div className="flex items-center gap-2 text-gray-600">
               <PawPrint className="w-4 h-4 text-primary-500" />
               <span>
-                宠物：{appointment.petName} ({appointment.petType})
+                宠物：{appointment.petName} ({appointment.petType}{appointment.petBreed ? ` · ${appointment.petBreed}` : ''})
               </span>
             </div>
+            {appointment.petAge && (
+              <div className="flex items-center gap-2 text-gray-600">
+                <Calendar className="w-4 h-4 text-primary-500" />
+                <span>年龄：{appointment.petAge}</span>
+              </div>
+            )}
             <div className="flex items-center gap-2 text-gray-600">
               <Phone className="w-4 h-4 text-primary-500" />
               <span>联系人：{appointment.ownerName} {appointment.phone}</span>
             </div>
           </div>
+          {appointment.symptoms && (
+            <div className="mt-3 flex items-start gap-2 text-sm text-gray-600">
+              <FileText className="w-4 h-4 text-primary-500 mt-0.5 flex-shrink-0" />
+              <span>症状：{appointment.symptoms}</span>
+            </div>
+          )}
         </div>
 
         {appointment.status === 'pending' && onCancel && (

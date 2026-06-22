@@ -29,6 +29,9 @@ export interface Appointment {
   time: string;
   petName: string;
   petType: string;
+  petBreed: string;
+  petAge: string;
+  symptoms: string;
   ownerName: string;
   phone: string;
   status: 'pending' | 'cancelled' | 'completed';

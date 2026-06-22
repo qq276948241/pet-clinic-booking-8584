@@ -7,19 +7,24 @@ import DepartmentCard from '@/components/DepartmentCard';
 import DoctorCard from '@/components/DoctorCard';
 import StepIndicator from '@/components/StepIndicator';
 import TimeSlotPicker from '@/components/TimeSlotPicker';
-import { CalendarCheck, ArrowLeft, ArrowRight, CheckCircle, PawPrint } from 'lucide-react';
+import PetInfoForm, { type PetInfoFormData } from '@/components/PetInfoForm';
+import { CalendarCheck, ArrowLeft, ArrowRight, CheckCircle, PawPrint, User, Phone } from 'lucide-react';
 import { getWeekday } from '@/utils/dateUtils';
 
-const steps = ['选择科室', '选择医生', '选择时间', '填写信息'];
-const petTypes = ['狗狗', '猫咪', '兔子', '仓鼠', '其他'];
+const steps = ['选择科室', '选择医生', '选择时间', '宠物信息', '联系信息'];
 
 export default function Booking() {
   const location = useLocation();
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState({
+  const [petInfo, setPetInfo] = useState<PetInfoFormData>({
     petName: '',
     petType: '狗狗',
+    petBreed: '',
+    petAge: '',
+    symptoms: '',
+  });
+  const [contactInfo, setContactInfo] = useState({
     ownerName: '',
     phone: '',
   });
@@ -78,9 +83,15 @@ export default function Booking() {
         return selectedDate !== null && selectedTime !== null;
       case 3:
         return (
-          formData.petName.trim() !== '' &&
-          formData.ownerName.trim() !== '' &&
-          formData.phone.trim() !== ''
+          petInfo.petName.trim() !== '' &&
+          petInfo.petBreed.trim() !== '' &&
+          petInfo.petAge.trim() !== '' &&
+          petInfo.symptoms.trim() !== ''
+        );
+      case 4:
+        return (
+          contactInfo.ownerName.trim() !== '' &&
+          contactInfo.phone.trim() !== ''
         );
       default:
         return false;
@@ -97,10 +108,13 @@ export default function Booking() {
       doctorId: selectedDoctor.id,
       date: selectedDate,
       time: selectedTime,
-      petName: formData.petName,
-      petType: formData.petType,
-      ownerName: formData.ownerName,
-      phone: formData.phone,
+      petName: petInfo.petName,
+      petType: petInfo.petType,
+      petBreed: petInfo.petBreed,
+      petAge: petInfo.petAge,
+      symptoms: petInfo.symptoms,
+      ownerName: contactInfo.ownerName,
+      phone: contactInfo.phone,
     });
 
     setShowSuccess(true);
@@ -108,6 +122,21 @@ export default function Booking() {
       navigate('/my-appointments');
     }, 2000);
   };
+
+  const renderSummaryBar = () => (
+    <div className="bg-primary-50 rounded-xl p-4 mb-6">
+      <p className="text-sm text-gray-600">
+        <span className="font-medium">科室：</span>{selectedDepartment?.name}
+        <span className="mx-3">|</span>
+        <span className="font-medium">医生：</span>{selectedDoctor?.name} {selectedDoctor?.title}
+      </p>
+      {selectedDate && selectedTime && (
+        <p className="text-sm text-gray-600 mt-1">
+          <span className="font-medium">时间：</span>{selectedDate} {getWeekday(selectedDate)} {selectedTime}
+        </p>
+      )}
+    </div>
+  );
 
   if (showSuccess) {
     return (
@@ -128,7 +157,10 @@ export default function Booking() {
               <span className="font-medium">医生：</span>{selectedDoctor?.name}
             </p>
             <p className="text-sm text-gray-600">
-              <span className="font-medium">时间：</span>{selectedDate} {getWeekday(selectedDate)} {selectedTime}
+              <span className="font-medium">时间：</span>{selectedDate} {getWeekday(selectedDate!)} {selectedTime}
+            </p>
+            <p className="text-sm text-gray-600">
+              <span className="font-medium">宠物：</span>{petInfo.petName} ({petInfo.petType} · {petInfo.petBreed})
             </p>
           </div>
         </div>
@@ -213,78 +245,75 @@ export default function Booking() {
 
           {currentStep === 3 && (
             <div>
+              {renderSummaryBar()}
+              <PetInfoForm data={petInfo} onChange={setPetInfo} />
+            </div>
+          )}
+
+          {currentStep === 4 && (
+            <div>
               <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                填写预约信息
+                填写联系信息
               </h2>
-              <div className="bg-primary-50 rounded-xl p-4 mb-6">
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">科室：</span>{selectedDepartment?.name}
-                  <span className="mx-3">|</span>
-                  <span className="font-medium">医生：</span>{selectedDoctor?.name}
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  <span className="font-medium">时间：</span>{selectedDate} {getWeekday(selectedDate!)} {selectedTime}
-                </p>
+              {renderSummaryBar()}
+              <div className="bg-white border border-primary-100 rounded-xl p-4 mb-6">
+                <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                  <PawPrint className="w-4 h-4 text-primary-500" />
+                  宠物信息确认
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                  <div>
+                    <span className="text-gray-500">名称：</span>
+                    <span className="text-gray-800 font-medium">{petInfo.petName}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">类型：</span>
+                    <span className="text-gray-800 font-medium">{petInfo.petType}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">品种：</span>
+                    <span className="text-gray-800 font-medium">{petInfo.petBreed}</span>
+                  </div>
+                  <div>
+                    <span className="text-gray-500">年龄：</span>
+                    <span className="text-gray-800 font-medium">{petInfo.petAge}</span>
+                  </div>
+                </div>
+                {petInfo.symptoms && (
+                  <div className="mt-2 text-sm">
+                    <span className="text-gray-500">症状：</span>
+                    <span className="text-gray-800">{petInfo.symptoms}</span>
+                  </div>
+                )}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <PawPrint className="w-4 h-4 inline mr-1" />
-                    宠物名称 *
-                  </label>
-                  <input
-                    type="text"
-                    className="input-field"
-                    placeholder="请输入宠物名称"
-                    value={formData.petName}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, petName: e.target.value }))
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    宠物类型 *
-                  </label>
-                  <select
-                    className="input-field"
-                    value={formData.petType}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, petType: e.target.value }))
-                    }
-                  >
-                    {petTypes.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <User className="w-4 h-4 inline mr-1" />
                     主人姓名 *
                   </label>
                   <input
                     type="text"
                     className="input-field"
                     placeholder="请输入您的姓名"
-                    value={formData.ownerName}
+                    value={contactInfo.ownerName}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, ownerName: e.target.value }))
+                      setContactInfo((prev) => ({ ...prev, ownerName: e.target.value }))
                     }
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Phone className="w-4 h-4 inline mr-1" />
                     联系电话 *
                   </label>
                   <input
                     type="tel"
                     className="input-field"
                     placeholder="请输入联系电话"
-                    value={formData.phone}
+                    value={contactInfo.phone}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, phone: e.target.value }))
+                      setContactInfo((prev) => ({ ...prev, phone: e.target.value }))
                     }
                   />
                 </div>
