@@ -1,18 +1,16 @@
-import { User, Award, Calendar } from 'lucide-react';
+import { User, Award } from 'lucide-react';
 import type { Doctor } from '@/types';
-import { useBookingStore } from '@/store/useBookingStore';
 
 interface DoctorCardProps {
   doctor: Doctor;
+  isSelected?: boolean;
+  onClick?: () => void;
 }
 
-const DoctorCard = ({ doctor }: DoctorCardProps) => {
-  const { selectedDoctor, setSelectedDoctor } = useBookingStore();
-  const isSelected = selectedDoctor?.id === doctor.id;
-
+const DoctorCard = ({ doctor, isSelected = false, onClick }: DoctorCardProps) => {
   return (
     <div
-      onClick={() => setSelectedDoctor(isSelected ? null : doctor)}
+      onClick={onClick}
       className={`bg-white rounded-2xl p-5 shadow-card transition-all duration-300 hover:shadow-card-hover cursor-pointer border-2 ${
         isSelected ? 'border-primary-400 bg-primary-50' : 'border-transparent'
       }`}

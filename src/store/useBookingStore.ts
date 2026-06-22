@@ -19,13 +19,22 @@ export const useBookingStore = create<BookingState>()(
       appointments: [],
 
       setSelectedDepartment: (dept: Department | null) =>
-        set({ selectedDepartment: dept, selectedDoctor: null, selectedTimeSlot: null }),
+        set((state) => {
+          if (state.selectedDepartment?.id === dept?.id) return {};
+          return { selectedDepartment: dept, selectedDoctor: null, selectedTimeSlot: null, selectedDate: null };
+        }),
 
       setSelectedDoctor: (doctor: Doctor | null) =>
-        set({ selectedDoctor: doctor, selectedTimeSlot: null }),
+        set((state) => {
+          if (state.selectedDoctor?.id === doctor?.id) return {};
+          return { selectedDoctor: doctor, selectedTimeSlot: null };
+        }),
 
       setSelectedDate: (date: string | null) =>
-        set({ selectedDate: date, selectedTimeSlot: null }),
+        set((state) => {
+          if (state.selectedDate === date) return {};
+          return { selectedDate: date, selectedTimeSlot: null };
+        }),
 
       setSelectedTimeSlot: (slot: TimeSlot | null) =>
         set({ selectedTimeSlot: slot }),

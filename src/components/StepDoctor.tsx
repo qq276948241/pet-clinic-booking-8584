@@ -16,8 +16,9 @@ const StepDoctor = ({ onNext }: StepDoctorProps) => {
   }, [selectedDepartment]);
 
   const handleSelect = (doctor: typeof filteredDoctors[0]) => {
+    const isAlreadySelected = selectedDoctor?.id === doctor.id;
     setSelectedDoctor(doctor);
-    if (onNext && !selectedDoctor) {
+    if (onNext && !isAlreadySelected) {
       setTimeout(onNext, 200);
     }
   };
@@ -30,9 +31,12 @@ const StepDoctor = ({ onNext }: StepDoctorProps) => {
       </p>
       <div className="space-y-4">
         {filteredDoctors.map((doctor) => (
-          <div key={doctor.id} onClick={() => handleSelect(doctor)}>
-            <DoctorCard doctor={doctor} />
-          </div>
+          <DoctorCard
+            key={doctor.id}
+            doctor={doctor}
+            isSelected={selectedDoctor?.id === doctor.id}
+            onClick={() => handleSelect(doctor)}
+          />
         ))}
       </div>
     </div>

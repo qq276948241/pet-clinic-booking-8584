@@ -6,17 +6,26 @@ import { useBookingStore } from '@/store/useBookingStore';
 interface DepartmentCardProps {
   department: Department;
   showAction?: boolean;
+  isSelected?: boolean;
+  onClick?: () => void;
 }
 
-const DepartmentCard = ({ department, showAction = true }: DepartmentCardProps) => {
+const DepartmentCard = ({
+  department,
+  showAction = true,
+  isSelected,
+  onClick,
+}: DepartmentCardProps) => {
   const navigate = useNavigate();
   const { selectedDepartment, setSelectedDepartment } = useBookingStore();
-  const isSelected = selectedDepartment?.id === department.id;
+  const selected = isSelected ?? selectedDepartment?.id === department.id;
 
   const IconComponent = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[department.icon] || Icons.HelpCircle;
 
   const handleClick = () => {
-    if (showAction) {
+    if (onClick) {
+      onClick();
+    } else if (showAction) {
       setSelectedDepartment(department);
       navigate('/booking');
     }
@@ -26,7 +35,7 @@ const DepartmentCard = ({ department, showAction = true }: DepartmentCardProps) 
     <div
       onClick={handleClick}
       className={`bg-white rounded-2xl p-5 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 cursor-pointer border-2 ${
-        isSelected ? 'border-primary-400 bg-primary-50' : 'border-transparent'
+        selected ? 'border-primary-400 bg-primary-50' : 'border-transparent'
       }`}
     >
       <div className="flex items-start gap-4">

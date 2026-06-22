@@ -10,8 +10,9 @@ const StepDepartment = ({ onNext }: StepDepartmentProps) => {
   const { selectedDepartment, setSelectedDepartment } = useBookingStore();
 
   const handleSelect = (dept: typeof departments[0]) => {
+    const isAlreadySelected = selectedDepartment?.id === dept.id;
     setSelectedDepartment(dept);
-    if (onNext) {
+    if (onNext && !isAlreadySelected) {
       setTimeout(onNext, 200);
     }
   };
@@ -22,13 +23,12 @@ const StepDepartment = ({ onNext }: StepDepartmentProps) => {
       <p className="text-gray-500 mb-6">请选择您需要就诊的科室</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {departments.map((dept) => (
-          <div
+          <DepartmentCard
             key={dept.id}
+            department={dept}
+            showAction={false}
             onClick={() => handleSelect(dept)}
-            className="cursor-pointer"
-          >
-            <DepartmentCard department={dept} showAction={false} />
-          </div>
+          />
         ))}
       </div>
     </div>
