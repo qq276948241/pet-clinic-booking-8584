@@ -1,36 +1,23 @@
-import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useBookingStore } from '@/store/useBookingStore';
-import { departments } from '@/data/departments';
-import { getDoctorsByDepartment } from '@/data/doctors';
 import DepartmentCard from '@/components/DepartmentCard';
 import DoctorCard from '@/components/DoctorCard';
 import StepIndicator from '@/components/StepIndicator';
 import TimeSlotPicker from '@/components/TimeSlotPicker';
-import PetInfoForm, { type PetInfoFormData } from '@/components/PetInfoForm';
+import PetInfoForm from '@/components/PetInfoForm';
+import { useBookingForm } from '@/hooks/useBookingForm';
+import { departments } from '@/data/departments';
 import { CalendarCheck, ArrowLeft, ArrowRight, CheckCircle, PawPrint, User, Phone } from 'lucide-react';
-import { getWeekday } from '@/utils/dateUtils';
-
-const steps = ['选择科室', '选择医生', '选择时间', '宠物信息', '联系信息'];
 
 export default function Booking() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [petInfo, setPetInfo] = useState<PetInfoFormData>({
-    petName: '',
-    petType: '狗狗',
-    petBreed: '',
-    petAge: '',
-    symptoms: '',
-  });
-  const [contactInfo, setContactInfo] = useState({
-    ownerName: '',
-    phone: '',
-  });
-  const [showSuccess, setShowSuccess] = useState(false);
-
   const {
+    steps,
+    currentStep,
+    isFirstStep,
+    isLastStep,
+    canProceed,
+    goNext,
+    goPrev,
+    submit,
+
     selectedDepartment,
     selectedDoctor,
     selectedDate,
@@ -39,104 +26,17 @@ export default function Booking() {
     setSelectedDoctor,
     setSelectedDate,
     setSelectedTime,
-    addAppointment,
-    clearSelection,
-  } = useBookingStore();
+    filteredDoctors,
 
-  useEffect(() => {
-    const state = location.state as { departmentId?: string } | null;
-    if (state?.departmentId) {
-      const dept = departments.find((d) => d.id === state.departmentId);
-      if (dept) {
-        setSelectedDepartment(dept);
-        setCurrentStep(1);
-      }
-    }
-    return () => {
-      clearSelection();
-    };
-  }, []);
+    petInfo,
+    setPetInfo,
+    contactInfo,
+    setContactInfo,
 
-  const filteredDoctors = selectedDepartment
-    ? getDoctorsByDepartment(selectedDepartment.id)
-    : [];
-
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep((prev) => prev + 1);
-    }
-  };
-
-  const handlePrev = () => {
-    if (currentStep > 0) {
-      setCurrentStep((prev) => prev - 1);
-    }
-  };
-
-  const canProceed = () => {
-    switch (currentStep) {
-      case 0:
-        return selectedDepartment !== null;
-      case 1:
-        return selectedDoctor !== null;
-      case 2:
-        return selectedDate !== null && selectedTime !== null;
-      case 3:
-        return (
-          petInfo.petName.trim() !== '' &&
-          petInfo.petBreed.trim() !== '' &&
-          petInfo.petAge.trim() !== '' &&
-          petInfo.symptoms.trim() !== ''
-        );
-      case 4:
-        return (
-          contactInfo.ownerName.trim() !== '' &&
-          contactInfo.phone.trim() !== ''
-        );
-      default:
-        return false;
-    }
-  };
-
-  const handleSubmit = () => {
-    if (!selectedDepartment || !selectedDoctor || !selectedDate || !selectedTime) {
-      return;
-    }
-
-    addAppointment({
-      departmentId: selectedDepartment.id,
-      doctorId: selectedDoctor.id,
-      date: selectedDate,
-      time: selectedTime,
-      petName: petInfo.petName,
-      petType: petInfo.petType,
-      petBreed: petInfo.petBreed,
-      petAge: petInfo.petAge,
-      symptoms: petInfo.symptoms,
-      ownerName: contactInfo.ownerName,
-      phone: contactInfo.phone,
-    });
-
-    setShowSuccess(true);
-    setTimeout(() => {
-      navigate('/my-appointments');
-    }, 2000);
-  };
-
-  const renderSummaryBar = () => (
-    <div className="bg-primary-50 rounded-xl p-4 mb-6">
-      <p className="text-sm text-gray-600">
-        <span className="font-medium">科室：</span>{selectedDepartment?.name}
-        <span className="mx-3">|</span>
-        <span className="font-medium">医生：</span>{selectedDoctor?.name} {selectedDoctor?.title}
-      </p>
-      {selectedDate && selectedTime && (
-        <p className="text-sm text-gray-600 mt-1">
-          <span className="font-medium">时间：</span>{selectedDate} {getWeekday(selectedDate)} {selectedTime}
-        </p>
-      )}
-    </div>
-  );
+    showSuccess,
+    summaryText,
+    timeText,
+  } = useBookingForm();
 
   if (showSuccess) {
     return (
@@ -157,7 +57,7 @@ export default function Booking() {
               <span className="font-medium">医生：</span>{selectedDoctor?.name}
             </p>
             <p className="text-sm text-gray-600">
-              <span className="font-medium">时间：</span>{selectedDate} {getWeekday(selectedDate!)} {selectedTime}
+              <span className="font-medium">{timeText}</span>
             </p>
             <p className="text-sm text-gray-600">
               <span className="font-medium">宠物：</span>{petInfo.petName} ({petInfo.petType} · {petInfo.petBreed})
@@ -229,9 +129,7 @@ export default function Booking() {
               </h2>
               <div className="bg-primary-50 rounded-xl p-4 mb-6">
                 <p className="text-sm text-gray-600">
-                  <span className="font-medium">科室：</span>{selectedDepartment?.name}
-                  <span className="mx-3">|</span>
-                  <span className="font-medium">医生：</span>{selectedDoctor?.name} {selectedDoctor?.title}
+                  <span className="font-medium">{summaryText}</span>
                 </p>
               </div>
               <TimeSlotPicker
@@ -245,7 +143,16 @@ export default function Booking() {
 
           {currentStep === 3 && (
             <div>
-              {renderSummaryBar()}
+              <div className="bg-primary-50 rounded-xl p-4 mb-6">
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">{summaryText}</span>
+                </p>
+                {timeText && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    <span className="font-medium">{timeText}</span>
+                  </p>
+                )}
+              </div>
               <PetInfoForm data={petInfo} onChange={setPetInfo} />
             </div>
           )}
@@ -255,7 +162,16 @@ export default function Booking() {
               <h2 className="text-xl font-semibold text-gray-800 mb-4">
                 填写联系信息
               </h2>
-              {renderSummaryBar()}
+              <div className="bg-primary-50 rounded-xl p-4 mb-6">
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">{summaryText}</span>
+                </p>
+                {timeText && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    <span className="font-medium">{timeText}</span>
+                  </p>
+                )}
+              </div>
               <div className="bg-white border border-primary-100 rounded-xl p-4 mb-6">
                 <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
                   <PawPrint className="w-4 h-4 text-primary-500" />
@@ -324,32 +240,32 @@ export default function Booking() {
           <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
             <button
               type="button"
-              onClick={handlePrev}
-              disabled={currentStep === 0}
+              onClick={goPrev}
+              disabled={isFirstStep}
               className="btn btn-outline gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="w-4 h-4" />
               上一步
             </button>
-            {currentStep < steps.length - 1 ? (
+            {isLastStep ? (
               <button
                 type="button"
-                onClick={handleNext}
-                disabled={!canProceed()}
-                className="btn btn-primary gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                下一步
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={!canProceed()}
+                onClick={submit}
+                disabled={!canProceed}
                 className="btn btn-primary gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <CheckCircle className="w-4 h-4" />
                 提交预约
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={goNext}
+                disabled={!canProceed}
+                className="btn btn-primary gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                下一步
+                <ArrowRight className="w-4 h-4" />
               </button>
             )}
           </div>
