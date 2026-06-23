@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #F8FAFC;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-card border border-primary-100 shadow-card transition-all duration-300 hover:shadow-card-hover hover:-translate-y-0.5;
+  }
+
+  .btn-primary {
+    @apply bg-primary-500 text-white px-6 py-3 rounded-btn font-medium transition-all duration-200 hover:bg-primary-600 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-primary-600 border-2 border-primary-200 px-6 py-3 rounded-btn font-medium transition-all duration-200 hover:bg-primary-50 hover:border-primary-300 active:scale-95;
+  }
+
+  .btn-danger {
+    @apply bg-red-50 text-red-600 border-2 border-red-200 px-6 py-3 rounded-btn font-medium transition-all duration-200 hover:bg-red-100 hover:border-red-300 active:scale-95;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 border-2 border-primary-100 rounded-input focus:border-primary-400 focus:outline-none transition-colors duration-200;
+  }
+
+  .nav-link {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+  }
+
+  .nav-link-active {
+    @apply bg-primary-100 text-primary-700;
+  }
+
+  .nav-link-inactive {
+    @apply text-gray-600 hover:bg-primary-50 hover:text-primary-600;
+  }
+
+  .step-done {
+    @apply bg-primary-500 text-white border-primary-500;
+  }
+
+  .step-active {
+    @apply bg-white text-primary-600 border-2 border-primary-500 ring-4 ring-primary-100;
+  }
+
+  .step-pending {
+    @apply bg-gray-100 text-gray-400 border-gray-200;
+  }
+}
