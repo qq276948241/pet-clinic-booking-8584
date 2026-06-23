@@ -1,166 +1,152 @@
-import { useNavigate } from 'react-router-dom';
-import { Stethoscope, Shield, Clock, Award, Heart, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import {
+  Stethoscope,
+  Scissors,
+  Bone,
+  Eye,
+  Smile,
+  ShieldCheck,
+  Heart,
+  Clock,
+  Award,
+  ArrowRight,
+  PawPrint,
+  Sparkles,
+} from 'lucide-react';
 import { departments } from '@/data/mockData';
-import DepartmentCard from '@/components/DepartmentCard';
 
-const Home = () => {
-  const navigate = useNavigate();
-
-  const features = [
-    {
-      icon: Shield,
-      title: '专业医疗团队',
-      description: '10+位资深执业兽医，平均经验10年以上',
-      color: '#38BDF8',
-    },
-    {
-      icon: Clock,
-      title: '24小时急诊',
-      description: '全天候急诊服务，守护爱宠健康每一刻',
-      color: '#0EA5E9',
-    },
-    {
-      icon: Award,
-      title: '先进设备',
-      description: '进口医疗设备，精准诊断，科学治疗',
-      color: '#06B6D4',
-    },
-  ];
-
-  const hotDepartments = departments.slice(0, 6);
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-50/50 to-white">
-      <section className="relative py-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-100/60 via-primary-50 to-white" />
-        <div className="absolute top-20 right-10 w-72 h-72 bg-primary-200/30 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-10 w-96 h-96 bg-primary-100/40 rounded-full blur-3xl" />
-
-        <div className="container mx-auto relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur rounded-full text-primary-600 text-sm font-medium mb-6 shadow-sm">
-              <Heart className="w-4 h-4 text-red-400" />
-              专业宠物诊疗 · 用心呵护
-            </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-800 mb-6 leading-tight">
-              为爱宠健康
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-primary-700">
-                保驾护航
-              </span>
-            </h1>
-            <p className="text-lg text-gray-600 mb-8 max-w-xl mx-auto">
-              爱宠医院拥有专业的医疗团队和先进的诊疗设备，
-              提供内科、外科、皮肤科、牙科等全方位宠物医疗服务，
-              让您的爱宠享受最优质的医疗护理。
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <button
-                onClick={() => navigate('/booking')}
-                className="px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-2xl shadow-lg shadow-primary-200 hover:shadow-xl hover:shadow-primary-300 hover:-translate-y-0.5 transition-all duration-300"
-              >
-                立即预约挂号
-              </button>
-              <button
-                onClick={() => navigate('/my-appointments')}
-                className="px-8 py-4 bg-white text-gray-700 font-semibold rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 border border-gray-200"
-              >
-                查看我的预约
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-3">为什么选择我们</h2>
-            <p className="text-gray-500">专业、贴心、高效的医疗服务</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl p-6 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300"
-              >
-                <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center mb-4"
-                  style={{ backgroundColor: `${feature.color}15`, color: feature.color }}
-                >
-                  <feature.icon className="w-7 h-7" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">{feature.title}</h3>
-                <p className="text-gray-500">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto">
-          <div className="flex items-center justify-between mb-10">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">热门科室</h2>
-              <p className="text-gray-500">选择您需要的科室，快速预约挂号</p>
-            </div>
-            <button
-              onClick={() => navigate('/booking')}
-              className="hidden sm:flex items-center gap-2 text-primary-500 hover:text-primary-600 font-medium transition-colors"
-            >
-              全部科室
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {hotDepartments.map((dept) => (
-              <DepartmentCard key={dept.id} department={dept} />
-            ))}
-          </div>
-          <div className="mt-8 text-center sm:hidden">
-            <button
-              onClick={() => navigate('/booking')}
-              className="inline-flex items-center gap-2 text-primary-500 font-medium"
-            >
-              查看全部科室
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16 px-4 bg-gradient-to-br from-primary-50 to-white">
-        <div className="container mx-auto">
-          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-card text-center max-w-4xl mx-auto">
-            <div className="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Stethoscope className="w-8 h-8 text-primary-500" />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              爱宠的健康，是我们最大的心愿
-            </h2>
-            <p className="text-gray-500 mb-8 max-w-xl mx-auto">
-              立即预约，为您的爱宠预约专业的医疗服务。
-              我们将以最专业的态度和最温暖的服务，守护每一个毛茸茸的家庭成员。
-            </p>
-            <button
-              onClick={() => navigate('/booking')}
-              className="px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-2xl shadow-lg shadow-primary-200 hover:shadow-xl hover:shadow-primary-300 hover:-translate-y-0.5 transition-all duration-300"
-            >
-              现在就预约
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <footer className="py-8 px-4 bg-gray-50 border-t border-gray-100">
-        <div className="container mx-auto text-center text-gray-500 text-sm">
-          <p>© 2026 爱宠医院 版权所有</p>
-          <p className="mt-1">24小时服务热线：400-888-8888</p>
-        </div>
-      </footer>
-    </div>
-  );
+const iconMap: Record<string, React.ElementType> = {
+  Stethoscope,
+  Scissors,
+  Bone,
+  Eye,
+  Smile,
+  ShieldCheck,
 };
 
-export default Home;
+const features = [
+  { icon: Award, label: '三甲资质', desc: '国家认证宠物医院' },
+  { icon: Clock, label: '全年无休', desc: '24小时急诊服务' },
+  { icon: Heart, label: '专业团队', desc: '30+资深兽医师' },
+  { icon: Sparkles, label: '先进设备', desc: '进口诊疗仪器' },
+];
+
+export default function Home() {
+  return (
+    <div className="min-h-screen">
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary-400 via-primary-500 to-primary-600">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 text-white">
+            <PawPrint className="w-20 h-20 rotate-[-15deg]" />
+          </div>
+          <div className="absolute top-32 right-20 text-white">
+            <PawPrint className="w-14 h-14 rotate-[20deg]" />
+          </div>
+          <div className="absolute bottom-8 left-1/3 text-white">
+            <PawPrint className="w-16 h-16 rotate-[-30deg]" />
+          </div>
+          <div className="absolute bottom-20 right-10 text-white">
+            <PawPrint className="w-10 h-10 rotate-[45deg]" />
+          </div>
+        </div>
+        <div className="container mx-auto px-4 py-16 md:py-24 relative">
+          <div className="max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white text-sm font-medium mb-6">
+              <Sparkles className="w-4 h-4" />
+              值得信赖的宠物医疗伙伴
+            </div>
+            <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-4">
+              给毛孩子
+              <br />
+              <span className="text-white/90">最贴心的健康守护</span>
+            </h1>
+            <p className="text-primary-100 text-lg mb-8 leading-relaxed">
+              宠爱宠物医院，专注宠物健康 15 年。专业团队、先进设备，
+              <br className="hidden md:block" />
+              为您的爱宠提供全方位医疗服务。
+            </p>
+            <Link
+              to="/appointment"
+              className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-primary-600 rounded-2xl font-semibold text-base shadow-lg shadow-primary-700/20 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 no-underline"
+            >
+              立即预约挂号
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-surface-100 to-transparent" />
+      </section>
+
+      <section className="container mx-auto px-4 -mt-4 relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {features.map(({ icon: Icon, label, desc }) => (
+            <div
+              key={label}
+              className="card-base p-5 flex flex-col items-center text-center card-hover"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-primary-50 flex items-center justify-center mb-3">
+                <Icon className="w-6 h-6 text-primary-500" />
+              </div>
+              <span className="font-semibold text-gray-800 text-sm">{label}</span>
+              <span className="text-xs text-gray-400 mt-1">{desc}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 py-12">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">热门科室</h2>
+            <p className="text-sm text-gray-400 mt-1">选择科室，为爱宠预约专业诊疗</p>
+          </div>
+          <Link
+            to="/appointment"
+            className="flex items-center gap-1 text-primary-500 text-sm font-medium no-underline hover:gap-2 transition-all"
+          >
+            全部科室 <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {departments.map((dept) => {
+            const Icon = iconMap[dept.icon] || Stethoscope;
+            return (
+              <Link
+                key={dept.id}
+                to={`/appointment?dept=${dept.id}`}
+                className="card-base p-5 card-hover no-underline group"
+              >
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center mb-3 group-hover:from-primary-100 group-hover:to-primary-200 transition-colors duration-300">
+                  <Icon className="w-6 h-6 text-primary-500" />
+                </div>
+                <h3 className="font-semibold text-gray-800 text-base">{dept.name}</h3>
+                <p className="text-xs text-gray-400 mt-1.5 leading-relaxed">
+                  {dept.description}
+                </p>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 pb-12">
+        <div className="card-base p-8 bg-gradient-to-r from-primary-50 to-white border border-primary-100">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">还有疑问？</h2>
+              <p className="text-sm text-gray-400 mt-1">
+                拨打咨询热线，专业客服为您解答
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="text-2xl font-bold text-primary-600">400-888-9999</p>
+                <p className="text-xs text-gray-400">工作日 8:00-20:00</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

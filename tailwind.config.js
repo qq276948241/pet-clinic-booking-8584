@@ -6,28 +6,33 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: '1rem',
     },
     extend: {
       colors: {
         primary: {
-          50: '#F0F9FF',
-          100: '#E0F2FE',
-          200: '#BAE6FD',
-          300: '#7DD3FC',
-          400: '#38BDF8',
-          500: '#0EA5E9',
-          600: '#0284C7',
-          700: '#0369A1',
+          50: '#E8F4FD',
+          100: '#D1E9FB',
+          200: '#A3D3F7',
+          300: '#75BDF3',
+          400: '#4DACFF',
+          500: '#2B8FD9',
+          600: '#1A73E8',
+          700: '#1565C0',
+          800: '#0D47A1',
+          900: '#0A3270',
+        },
+        surface: {
+          50: '#F8FAFC',
+          100: '#F0F5FA',
+          200: '#E8EFF6',
         },
       },
       borderRadius: {
-        'xl': '16px',
-        '2xl': '20px',
+        '2xl': '1rem',
+        '3xl': '1.5rem',
       },
-      boxShadow: {
-        'card': '0 4px 20px rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 8px 30px rgba(0, 0, 0, 0.1)',
+      fontFamily: {
+        sans: ['"Noto Sans SC"', '"Inter"', 'system-ui', 'sans-serif'],
       },
     },
   },

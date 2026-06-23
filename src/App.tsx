@@ -1,22 +1,19 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Home from "@/pages/Home";
-import Booking from "@/pages/Booking";
-import MyAppointments from "@/pages/MyAppointments";
-import Navbar from "@/components/Navbar";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import Home from '@/pages/Home';
+import Appointment from '@/pages/Appointment';
+import MyAppointments from '@/pages/MyAppointments';
 
 export default function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-primary-50/30">
+      <div className="min-h-screen bg-surface-100">
         <Navbar />
-        <main className="pt-16">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/booking" element={<Booking />} />
-            <Route path="/my-appointments" element={<MyAppointments />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/appointment" element={<Appointment />} />
+          <Route path="/my-appointments" element={<MyAppointments />} />
+        </Routes>
       </div>
     </Router>
   );
